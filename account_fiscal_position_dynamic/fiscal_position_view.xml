@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="view_account_position_form" model="ir.ui.view">
+            <field name="name">account.fiscal.position.form.inherit</field>
+            <field name="model">account.fiscal.position</field>
+            <field name="inherit_id" ref="account.view_account_position_form"/>
+            <field name="arch" type="xml">
+                <field name="company_id" position="before">
+                    <field name="use"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_order_form" model="ir.ui.view">
+            <field name="name">sale.order.form.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <field name="fiscal_position" position="replace" />
+                <field name="partner_shipping_id" position="after">
+                    <field name="fiscal_position" widget="selection"
+                           attrs="{'readonly': [('invoice_exists','=', True)]}"
+                           domain="[('use', 'in', ('sale', 'all'))]"
+                           on_change="onchange_fiscal_position(fiscal_position, order_line)"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="invoice_form" model="ir.ui.view">
+            <field name="name">account.invoice.form.inherit</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <field name="fiscal_position" position="attributes">
+                    <attribute name="domain">[('use', 'in', ('sale', 'all'))]</attribute>
+                    <attribute name="on_change">onchange_fiscal_position(fiscal_position, type, invoice_line)</attribute>
+                </field>
+            </field>
+        </record>
+
+        <record id="invoice_supplier_form" model="ir.ui.view">
+            <field name="name">account.invoice.supplier.form.inherit</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <field name="fiscal_position" position="attributes">
+                    <attribute name="domain">[('use', 'in', ('purchase', 'all'))]</attribute>
+                    <attribute name="on_change">onchange_fiscal_position(fiscal_position, type, invoice_line)</attribute>
+                </field>
+            </field>
+        </record>
+
+        <record id="purchase_order_form" model="ir.ui.view">
+            <field name="name">purchase.order.form.inherit</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <field name="fiscal_position" position="replace" />
+                <field name="partner_id" position="after">
+                    <field name="fiscal_position" attrs="{'readonly': [('invoiced','=', True)]}" widget="selection"
+                           domain="[('use', 'in', ('purchase', 'all'))]"
+                           on_change="onchange_fiscal_position(fiscal_position, order_line)"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>
